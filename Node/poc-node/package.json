@@ -1,0 +1,12 @@
+{
+  "name": "poc-node",
+  "version": "1.0.0",
+  "description": "Hello World",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "end": "finish program"
+  },
+  "author": "Nate",
+  "license": "ISC"
+}
