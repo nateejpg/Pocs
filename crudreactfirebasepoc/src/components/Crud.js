@@ -7,7 +7,7 @@ const Crud = () => {
 
     useEffect(() => {
 
-        const FetchData = async () => {
+        const fetchData = async () => {
 
             try {
 
@@ -19,6 +19,8 @@ const Crud = () => {
 
                   setQuotes(singleQuote);
 
+                  console.log("Selected Index", singleQuoteIndex);
+
             } catch(error){
 
                 console.log("Couldnt load the API", error);
@@ -26,7 +28,7 @@ const Crud = () => {
             }
         }
 
-        FetchData();
+        fetchData();
 
     },[])
 

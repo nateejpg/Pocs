@@ -43,7 +43,7 @@ export const Home = () => {
 
   // Form Handler
 
-  const HandleSubmit = () => {
+  const HandleSubmit = (e) => {
     e.preventDefaut();
 
     alert(`Hello ${userName}`);
