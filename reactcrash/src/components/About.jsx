@@ -24,7 +24,7 @@ const About = () => {
   }, []);
 
   return (
-    <div>
+    <div>r
       <h1>
         Congratz, you've managed to learn about Ternary, Flags, Hooks, State,
         Effect, Props and Routes.

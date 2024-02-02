@@ -9,7 +9,7 @@ const Crud = () => {
 
   const AddTask = () => {
     if (newTask.trim() != "") {
-      setTasks([...tasks, { id: Date.now(), text: newTask }]);
+      setTasks([...tasks, { id: Date.now(), text: newTask }]); // Spread Operator
       setNewTask("");
     }
   };
