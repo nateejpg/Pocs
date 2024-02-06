@@ -10,13 +10,16 @@ const Add = () => {
     cover: "",
   });
 
+
   const handleChange = (e) => {
     setBook((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+
   console.log(book);
 
   const navigate = useNavigate();
+
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -29,6 +32,7 @@ const Add = () => {
     }
   };
 
+  
   return (
     <div className="Form">
       <h1>Add New Book</h1>

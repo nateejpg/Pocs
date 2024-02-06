@@ -41,7 +41,7 @@ const Books = () => {
               <span>{books.rating}</span>
             </li>
             <button onClick={() => handleDelete(books.id)}>Delete</button>
-            <button>Update</button>
+            <button><Link to={`/update/${books.id}`}>Update</Link></button>
           </div>
         ))}
       </div>
