@@ -33,20 +33,25 @@ app.listen(8800,() =>{
 const JWT_SECRET = "test";
 
 const generateToken = (userId) => {
-    return jwt.sign({userId}, JWT_SECRET, {expiresIn: "1h"})
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
 }
 
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
+
     const sql = "SELECT * FROM users WHERE `email` = ?";
 
     db.query(sql, [email], async (err, data) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({ error: "Internal server error" });
         }
+
         if (data.length === 0) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
+
+        // Compares both passwords
 
         try {
             const isPasswordValid = await bcrypt.compare(password, data[0].password);
@@ -55,17 +60,22 @@ app.post("/login", async (req, res) => {
                 return res.status(401).json({ error: "Invalid email or password" });
             }
 
-            // Generate token if password is valid
-            const token = generateToken(data[0].userId); // Assuming the userId is present in the data
+            const token = generateToken(data[0].userId);
 
-            // Return token along with success message
-            return res.json({ message: "Login successful", token });
+            const user = {
+                id: data[0].userId,
+                username: data[0].username,
+                email: data[0].email
+            };
+            
+            return res.json({ message: "Login successful", token, user });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ error: "Internal server error" });
         }
     });
 });
+
 
 
 //CRUD USERS && BOOKS
