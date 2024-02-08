@@ -48,6 +48,9 @@ const Books = () => {
       <Link to={"/add"}>
         <button>Add Book</button>
       </Link>
+      <Link to={"/login"}>
+          <button>Login</button>
+      </Link>
     </div>
   );
 };

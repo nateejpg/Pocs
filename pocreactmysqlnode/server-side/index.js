@@ -1,12 +1,15 @@
 import express from "express";
-import mysql2 from "mysql2"
-import cors from "cors"
+import mysql2 from "mysql2";
+import cors from "cors";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
+// CONNECT DATABASE
 const db = mysql2.createConnection({
     host: "localhost",
     user: "root",
@@ -14,13 +17,63 @@ const db = mysql2.createConnection({
     database: "test"
 });
 
+// SET UP SERVER
 app.get("/", (req,res) => {
-    res.json("Hello, you've reached the backend!")
+    res.json("Hello, you've reached the backend!");
 })
 
+app.listen(8800,() =>{
+    console.log("Hello World, backend is up!")
+} )
+
+
+// LOGIN
+
+// Secret key to login
+const JWT_SECRET = "test";
+
+const generateToken = (userId) => {
+    return jwt.sign({userId}, JWT_SECRET, {expiresIn: "1h"})
+}
+
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    const sql = "SELECT * FROM users WHERE `email` = ?";
+
+    db.query(sql, [email], async (err, data) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal server error" });
+        }
+        if (data.length === 0) {
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+
+        try {
+            const isPasswordValid = await bcrypt.compare(password, data[0].password);
+
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: "Invalid email or password" });
+            }
+
+            // Generate token if password is valid
+            const token = generateToken(data[0].userId); // Assuming the userId is present in the data
+
+            // Return token along with success message
+            return res.json({ message: "Login successful", token });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Internal server error" });
+        }
+    });
+});
+
+
+//CRUD USERS && BOOKS
+// READ
+
 app.get("/books", (req, res) => {
-    const q = "SELECT * FROM books"
-    db.query(q, (err, data) => {
+    const sql = "SELECT * FROM books"
+    db.query(sql, (err, data) => {
         if(err){
             return res.json(err)
         }else{
@@ -29,9 +82,25 @@ app.get("/books", (req, res) => {
     })
 })
 
+app.get("/users", (req, res) => {
+
+    const sql = "SELECT * FROM users"
+
+    db.query(sql, (err, data) => {
+        if(err){
+            return console.log(err)
+        }else{
+            return res.json(data);
+        }
+    })
+
+})
+
+// CREATE
+
 app.post("/books", (req, res) => {
 
-    const q = "INSERT INTO books (`title`, `description`, `rating`,`cover`) VALUES (?)";
+    const sql = "INSERT INTO books (`title`, `description`, `rating`,`cover`) VALUES (?)";
 
     const values = [
         req.body.title,
@@ -40,7 +109,7 @@ app.post("/books", (req, res) => {
         req.body.cover,
     ];
 
-    db.query(q, [values], (err, data) => {
+    db.query(sql, [values], (err, data) => {
         if(err){
             return res.json(err)
         }else{
@@ -49,12 +118,43 @@ app.post("/books", (req, res) => {
     })
 })
 
+app.post("/users",  async (req, res) => {
+
+    const {username, email, password} = req.body;
+
+    try{
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const sql = "INSERT INTO users (`username`, `email`, `password`) VALUES (?)";
+
+        const values = [
+            req.body.username,
+            req.body.email,
+            hashedPassword,
+        ]
+        
+        db.query(sql, [values],(err, data) => {
+    
+            if(err){
+                return console.log(err)
+            }else{
+                return res.json("User has been created");
+            }
+        })
+    }catch(err){
+        return console.log(err);
+    }
+})
+
+
+// DELETE 
+
 app.delete("/books/:id", (req, res) => {
 
     const bookId = req.params.id;
-    const q = "DELETE FROM books WHERE id = ?";
+    const sql = "DELETE FROM books WHERE id = ?";
 
-    db.query(q, [bookId], (err, data) => {
+    db.query(sql, [bookId], (err, data) => {
 
         if(err){
             return res.json(err)
@@ -64,10 +164,30 @@ app.delete("/books/:id", (req, res) => {
     })
 })
 
+
+app.delete("/users/:id", (req, res) => {
+
+    const userID = req.params.id;
+    const sql = "DELETE FROM users WHERE id = ?"
+    
+    db.query(sql, [userID], (err, data) => {
+
+        if(err){
+            return res.json(err);
+        }else{
+            return res.json("User has been successfully deleted")
+        }
+    })
+
+    
+})
+
+// USE
+
 app.put("/books/:id", (req, res) => {
 
     const bookId = req.params.id;
-    const q = "UPDATE books SET `title` = ?, `description`= ?, `rating` = ?, `cover` = ? WHERE id = ?";
+    const sql = "UPDATE books SET `title` = ?, `description`= ?, `rating` = ?, `cover` = ? WHERE id = ?";
 
     const values = [
         req.body.title,
@@ -76,7 +196,7 @@ app.put("/books/:id", (req, res) => {
         req.body.cover,
     ]
 
-    db.query(q, [...values, bookId], (err, data) => {
+    db.query(sql, [...values, bookId], (err, data) => {
 
         if(err){
             return res.json(err)
@@ -85,9 +205,3 @@ app.put("/books/:id", (req, res) => {
         }
     })
 })
-
-
-
-app.listen(8800,() =>{
-    console.log("Hello World, backend is up!")
-} )
