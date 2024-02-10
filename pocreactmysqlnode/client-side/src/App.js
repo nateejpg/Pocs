@@ -5,25 +5,28 @@ import Add from "./Pages/Add";
 import Update from "./Pages/Update"
 import Login from './Pages/Login';
 import Register from "./Pages/Register"
+import Home from "./Pages/Home"
 
 function App() {
 
-  const [username, setUsername] = useState('');
+  const [userName, setUsername] = useState('');
+  const [userId, setUserId] = useState('');
 
   const handleLogin = (userData) => {
       
     // Sets up the user from Login Comp to the App, so I can transfer the Data
 
-    setUsername(userData)
-    console.log("Hello", username)
+    setUsername(userData.username);
+    setUserId(userData.id)
 
   }
 
   return (
     <BrowserRouter>
         <Routes>
-          <Route path='/' element={<Books user = {username}/>}/>
-          <Route path='/add' element={<Add/>}/>
+          <Route path='/' element={<Home/>}/>
+          <Route path='/books' element={<Books user={userName} id={userId}/>}/>
+          <Route path='/add' element={<Add id={userId}/>}/>
           <Route path='/update/:id' element={<Update/>}/>
           <Route path='/login' element={<Login onLogin = {handleLogin}/>}/>
           <Route path='/register' element={<Register/>}/>

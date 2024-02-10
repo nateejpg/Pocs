@@ -31,7 +31,7 @@ const Update = () => {
 
     try {
       await axios.put("http://localhost:8800/books/" + bookId, book);
-      navigate("/");
+      navigate("/books");
     } catch (err) {
       console.log(err);
     }

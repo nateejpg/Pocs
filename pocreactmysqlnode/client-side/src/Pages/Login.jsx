@@ -8,8 +8,6 @@ const Login = ({onLogin}) => {
         password: ''
     });
 
-    const [user, setUser] = useState("");
-
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -23,14 +21,13 @@ const Login = ({onLogin}) => {
             const res = await axios.post('http://localhost:8800/login', userInfo);
             console.log('Login successful:', res.data);
 
-            // Setting the user from the database to a state / local variable
-            setUser(res.data.user.username);
+            // Using the function already created on the APP part
+            onLogin({
+                username: res.data.user.username,
+                id: res.data.user.id,
+            });
 
-            onLogin(res.data.user.username);
-
-            console.log(user);
-
-             navigate('/');
+             navigate('/books');
         } catch (err) {
             if (err.response && err.response.data && err.response.data.error) {
                 console.log('Login failed:', err.response.data.error);
@@ -48,8 +45,6 @@ const Login = ({onLogin}) => {
                 <input type='password' placeholder='Enter your Password:' name='password' onChange={handleChange} />
                 <button type='submit'>Login</button>
                 <Link to='/register'>Don't have an account?</Link>
-                <h1>{user}</h1>
-
             </form>
         </div>
     );

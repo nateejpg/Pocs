@@ -2,21 +2,21 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Add = () => {
+const Add = ({id}) => {
   const [book, setBook] = useState({
     title: "",
     description: "",
     rating: null,
     cover: "",
+    userId: id
   });
+
+   console.log(id);
 
 
   const handleChange = (e) => {
     setBook((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
-
-  console.log(book);
 
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ const Add = () => {
 
     try {
       await axios.post("http://localhost:8800/books", book);
-      navigate("/");
+      navigate("/books");
     } catch (err) {
       console.log(err);
     }

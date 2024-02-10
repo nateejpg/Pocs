@@ -2,13 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const Books = ({ user }) => {
+const Books = ({ user, id}) => {
+
   const [books, setBooks] = useState([]);
+  
+  const userId = id;
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const res = await axios.get("http://localhost:8800/books");
+        const res = await axios.get(`http://localhost:8800/books?userId=${userId}`);
         setBooks(res.data);
       } catch (err) {
         console.log(err);
@@ -28,13 +31,13 @@ const Books = ({ user }) => {
       console.log(err);
     }
   };
-  
 
   return (
     <div>
       <h1>{user ? `${user}'s` : ""} Book Shelf</h1>
+      <h1>{id && `${id}`}</h1>
       <div className="books">
-        {books.map((book) => (
+    {!user ? ("") : (books.map((book) => (
           <div key={book.id} className="book">
             <li>
               <img className="img" src={book.cover} alt={book.title}></img>
@@ -45,14 +48,13 @@ const Books = ({ user }) => {
             <button onClick={() => handleDelete(book.id)}>Delete</button>
             <button><Link to={`/update/${book.id}`}>Update</Link></button>
           </div>
-        ))}
+        )))}
       </div>
       <Link to={"/add"}>
         <button>Add Book</button>
       </Link>
-      <Link to={"/login"}>
-        <button>Login</button>
-      </Link>
+      <Link to={"/"}><button>Log-out</button>
+</Link>
     </div>
   );
 };
