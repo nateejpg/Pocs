@@ -26,7 +26,9 @@ const Books = ({ user, id}) => {
       console.log("Deleting book with id", id);
       await axios.delete("http://localhost:8800/books/" + id);
       console.log("deleted id was: ", id);
-      window.location.reload();
+      
+      setBooks(prevBooks => books.filter(book => book.id !== id))
+
     } catch (err) {
       console.log(err);
     }
@@ -34,7 +36,7 @@ const Books = ({ user, id}) => {
 
   return (
     <div>
-      <h1>{user ? `${user}'s` : ""} Book Shelf</h1>
+      <h1>{user ? `${user}'s Book Shelf` : ""}</h1>
       <h1>{id && `${id}`}</h1>
       <div className="books">
     {!user ? ("") : (books.map((book) => (
@@ -50,11 +52,10 @@ const Books = ({ user, id}) => {
           </div>
         )))}
       </div>
-      <Link to={"/add"}>
+      {user ? (<Link to={"/add"}>
         <button>Add Book</button>
-      </Link>
-      <Link to={"/"}><button>Log-out</button>
-</Link>
+      </Link>) : ("")}
+      {user ? (<Link to={"/"}><button>Log-out</button></Link>) : (<Link to={"/login"}><button>Login</button></Link>)}
     </div>
   );
 };
