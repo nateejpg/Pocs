@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Books from './Pages/Books';
 import Add from "./Pages/Add";
 import Update from "./Pages/Update"
@@ -16,16 +16,46 @@ function App() {
       
     // Sets up the user from Login Comp to the App, so I can transfer the Data
 
-    setUsername(userData.username);
-    setUserId(userData.id)
+    updateUserName(userData.username);
+    updateUserId(userData.id);
 
   }
+
+  const handleLogout = () => {
+  
+    window.localStorage.removeItem("idTest");
+    window.localStorage.removeItem("userTest");
+
+    setUsername("");
+    setUserId("");
+  };
+
+  const updateUserId = (id) => {
+
+    window.localStorage.setItem("idTest",id);
+  }
+
+  const updateUserName = (user) => {
+
+
+    window.localStorage.setItem("userTest",user);
+  }
+
+  useEffect(() => {
+
+    const idGet = window.localStorage.getItem("idTest");
+    const userGet = window.localStorage.getItem("userTest");
+
+    setUsername(userGet)
+    setUserId(idGet)
+
+  },[])
 
   return (
     <BrowserRouter>
         <Routes>
           <Route path='/' element={<Home/>}/>
-          <Route path='/books' element={<Books user={userName} id={userId}/>}/>
+          <Route path='/books' element={<Books user={userName} id={userId} onLogout={handleLogout}/>}/>
           <Route path='/add' element={<Add id={userId}/>}/>
           <Route path='/update/:id' element={<Update/>}/>
           <Route path='/login' element={<Login onLogin = {handleLogin}/>}/>

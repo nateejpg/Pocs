@@ -2,16 +2,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const Books = ({ user, id}) => {
+const Books = ({ user, id, onLogout}) => {
 
   const [books, setBooks] = useState([]);
   
-  const userId = id;
+  console.log(id)
 
   useEffect(() => {
+
+    if(!id){
+      return
+    }
+
     const fetchBooks = async () => {
       try {
-        const res = await axios.get(`http://localhost:8800/books?userId=${userId}`);
+        const res = await axios.get(`http://localhost:8800/books?userId=${id}`);
         setBooks(res.data);
       } catch (err) {
         console.log(err);
@@ -19,7 +24,7 @@ const Books = ({ user, id}) => {
     };
 
     fetchBooks();
-  }, []);
+  }, [id]);
 
   const handleDelete = async (id) => {
     try {
@@ -55,7 +60,7 @@ const Books = ({ user, id}) => {
       {user ? (<Link to={"/add"}>
         <button>Add Book</button>
       </Link>) : ("")}
-      {user ? (<Link to={"/"}><button>Log-out</button></Link>) : (<Link to={"/login"}><button>Login</button></Link>)}
+      {user ? (<button onClick={onLogout}>Log-out</button>) : (<Link to={"/login"}><button>Login</button></Link>)}
     </div>
   );
 };
