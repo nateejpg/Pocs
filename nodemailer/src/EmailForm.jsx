@@ -1,42 +1,37 @@
-// EmailForm.js
-
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const EmailForm = ({ sendEmails }) => {
+const SubscribeForm = () => {
   const [email, setEmail] = useState('');
-  const [emailsList, setEmailsList] = useState([]);
+  const [message, setMessage] = useState('');
 
-  const handleInputChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email.trim() !== '') {
-      setEmailsList([...emailsList, email]);
-      setEmail('');
+
+    try {
+      const response = await axios.post('http://localhost:5000/subscribe', { email });
+      setMessage(response.data);
+    } catch (error) {
+      setMessage('Subscription failed.');
+      console.error('Error:', error.response ? error.response.data : error.message);
     }
   };
 
-  const handleSendEmails = () => {
-    sendEmails(emailsList); // Call sendEmails function with emailsList
-    setEmailsList([]); // Clear emailsList after sending
-  };
-
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>Email:</label>
         <input
           type="email"
-          placeholder="Enter email"
           value={email}
-          onChange={handleInputChange}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
-        <button type="submit">Add Email</button>
-      </form>
-      <button onClick={handleSendEmails}>Send Emails</button>
-    </div>
+      </div>
+      <button type="submit">Subscribe</button>
+      {message && <p>{message}</p>}
+    </form>
   );
 };
 
-export default EmailForm;
+export default SubscribeForm;
