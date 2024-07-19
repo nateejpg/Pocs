@@ -1,9 +1,12 @@
 const nodemailer = require("nodemailer");
 const axios = require("axios");
+require('dotenv').config();
 
 // Mailchimp API configuration
-const mailchimpUrl = 'https://us13.api.mailchimp.com/3.0/lists/1879a78d15/members/';
-const mailchimpApiKey = '0f744e21df45bb637c8063dbdefce541-us13';
+const mailchimpUrl = 'https://us17.api.mailchimp.com/3.0/lists/6fddb0fbe3/members/';
+const API = process.env.API;
+const email = process.env.GMAIL_USER;
+const password = process.env.GMAIL_PASS;
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
@@ -12,8 +15,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "smartieclasses12345@gmail.com",
-    pass: "lhqx vxpv xvsw scam",
+    user: email,
+    pass: password,
   },
 });
 
@@ -22,7 +25,7 @@ const getSubscribers = async () => {
     const response = await axios.get(mailchimpUrl, {
       auth: {
         username: 'anystring',
-        password: mailchimpApiKey,
+        password: API,
       },
     });
     const subscribers = response.data.members
@@ -35,12 +38,23 @@ const getSubscribers = async () => {
   }
 };
 
-const sendMail = async (transporter, mailOptions) => {
+const sendMail = async (emailAddress) => {
+  const mailOptions = {
+    from: {
+      name: "Nate",
+      address: email,
+    },
+    to: emailAddress,
+    subject: "AAAAAAAA",
+    text: "OiOi",
+    html: "<b>SIM</b>",
+  };
+
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Email has been sent!");
+    console.log(`Email sent to ${emailAddress}!`);
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error(`Error sending email to ${emailAddress}:`, error);
   }
 };
 
@@ -51,18 +65,9 @@ const main = async () => {
     return;
   }
 
-  const mailOptions = {
-    from: {
-      name: "Nate",
-      address: "smartieclasses12345@gmail.com"
-    },
-    to: subscribers,
-    subject: "Acho q tá funfando tudo oq a gente tentou!? ✔",
-    text: "OiOi",
-    html: "<b>SIM</b>",
-  };
-
-  await sendMail(transporter, mailOptions);
+  for (const subscriber of subscribers) {
+    await sendMail(subscriber);
+  }
 };
 
 main();
